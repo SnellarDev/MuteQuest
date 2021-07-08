@@ -43,7 +43,7 @@ namespace MuteAllQuestUsers
             }
         }
 
-        //CREDITS day helped me with da queue player i love you uwu
+        // CREDITS day helped me with da queue player i love you uwu
 
         public static IEnumerator QueuePlayerActions(Action<Player> OnPlayerAction, float WaitBetweenPlayer)
         {
@@ -59,7 +59,7 @@ namespace MuteAllQuestUsers
             yield return null;
         }
 
-        //POV you are Kirai Chan or Abbez about to pop a blood vessel because my code is not immaculate
+        // POV you are Kirai Chan or Abbez about to pop a blood vessel because my code is not immaculate
 
         private static void MuteAllQuest(Player __0)
         {
