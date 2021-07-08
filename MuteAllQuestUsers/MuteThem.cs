@@ -43,6 +43,8 @@ namespace MuteAllQuestUsers
             }
         }
 
+        //CREDITS day helped me with da queue player i love you uwu
+
         public static IEnumerator QueuePlayerActions(Action<Player> OnPlayerAction, float WaitBetweenPlayer)
         {
             var AllPlayers = PlayerExtensions.GetAllPlayers();
@@ -58,6 +60,7 @@ namespace MuteAllQuestUsers
         }
 
         //POV you are Kirai Chan or Abbez about to pop a blood vessel because my code is not immaculate
+
         private static void MuteAllQuest(Player __0)
         {
             if (Mute && __0.IsQuest())
