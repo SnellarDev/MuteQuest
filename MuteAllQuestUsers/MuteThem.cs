@@ -61,7 +61,7 @@ namespace MuteAllQuestUsers
 
         private static void MuteAllQuest(Player __0)
         {
-            if (Mute && __0.IsQuest())
+            if (Mute && __0.IsQuest()) // this will also mute people who spoof xd if you wanna be a quest user so bad then i guess we'll treat you like one
             {
                 if (User.ContainsKey(PlayerExtensions.GetAPIUser(__0).id))
                 {
