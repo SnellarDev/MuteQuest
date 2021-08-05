@@ -17,6 +17,7 @@ namespace MuteAllQuestUsers
         public override void OnApplicationStart()
         {
             CheckPlayers().Start();
+            WhereDaUI().Start();
         }
 
         public static IEnumerator CheckPlayers()
@@ -92,19 +93,21 @@ namespace MuteAllQuestUsers
 
         internal static Dictionary<string, MuteThem> User = new Dictionary<string, MuteThem>();
 
-        public override void OnLevelWasLoaded(int level)
+       public static void DAGUI()
         {
-            if (hasinit != true)
+            MuteButton = new QMToggleButton("ShortcutMenu", 5, -1, "MuteQuest", delegate
             {
-                MuteButton = new QMToggleButton("ShortcutMenu", 5, 2, "MuteQuest", delegate
-                {
-                    Mute = true;
-                }, "OFF", delegate
-                {
-                    Mute = false;
-                }, "Mutes all Quest Users", Color.cyan, Color.cyan, false, false);
-                hasinit = true;
-            }
+                Mute = true;
+            }, "OFF", delegate
+            {
+                Mute = false;
+            }, "Mutes all Quest Users", Color.cyan, Color.cyan, false, false);
+        }
+        private IEnumerator WhereDaUI()
+        {
+            while (VRCUiManager.prop_VRCUiManager_0 == null) yield return null; // Saw this on GitHub
+            DAGUI();
+            yield break;
         }
     }
 }
