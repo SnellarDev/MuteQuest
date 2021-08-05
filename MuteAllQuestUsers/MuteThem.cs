@@ -105,7 +105,7 @@ namespace MuteAllQuestUsers
         }
         private IEnumerator WhereDaUI()
         {
-            while (VRCUiManager.prop_VRCUiManager_0 == null) yield return null; // Saw this on GitHub
+            while (VRCUiManager.prop_VRCUiManager_0 == null) yield return null;
             DAGUI();
             yield break;
         }
