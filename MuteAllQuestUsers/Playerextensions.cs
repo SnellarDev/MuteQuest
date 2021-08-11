@@ -39,7 +39,7 @@ namespace MuteAllQuestUsers
         {
             get
             {
-                return PlayerExtensions.LocalVRCPlayer.field_Private_USpeaker_0;
+                return LocalVRCPlayer.field_Private_USpeaker_0;
             }
         }
 
@@ -47,7 +47,7 @@ namespace MuteAllQuestUsers
         {
             get
             {
-                return PlayerExtensions.LocalVRCPlayer.field_Private_VRCPlayerApi_0;
+                return LocalVRCPlayer.field_Private_VRCPlayerApi_0;
             }
         }
 
@@ -63,7 +63,7 @@ namespace MuteAllQuestUsers
         {
             get
             {
-                return PlayerExtensions.PManager.field_Private_List_1_Player_0.ToArray().ToList<Player>();
+                return PManager.field_Private_List_1_Player_0.ToArray().ToList<Player>();
             }
         }
 
@@ -127,12 +127,12 @@ namespace MuteAllQuestUsers
 
         public static void SendVRCEvent(VRC_EventHandler.VrcEvent vrcEvent, VRC_EventHandler.VrcBroadcastType type, GameObject instagator)
         {
-            if (PlayerExtensions.handler == null)
+            if (handler == null)
             {
-                PlayerExtensions.handler = Resources.FindObjectsOfTypeAll<VRC_EventHandler>().FirstOrDefault<VRC_EventHandler>();
+                handler = Resources.FindObjectsOfTypeAll<VRC_EventHandler>().FirstOrDefault<VRC_EventHandler>();
             }
             vrcEvent.ParameterObject = Player.prop_Player_0.prop_USpeaker_0.gameObject;
-            PlayerExtensions.handler.TriggerEvent(vrcEvent, type, instagator, 0f);
+            handler.TriggerEvent(vrcEvent, type, instagator, 0f);
         }
 
         public static GameObject InstantiatePrefab(string PrefabNAME, Vector3 position, Quaternion rotation)
@@ -177,7 +177,7 @@ namespace MuteAllQuestUsers
 
         public static void Teleport(this Player player)
         {
-            PlayerExtensions.LocalVRCPlayer.transform.position = player.GetVRCPlayer().transform.position;
+            LocalVRCPlayer.transform.position = player.GetVRCPlayer().transform.position;
         }
 
         public static void ReloadAvatar(this Player player)
@@ -193,7 +193,7 @@ namespace MuteAllQuestUsers
 
         public static void ReloadAllAvatars()
         {
-            PlayerExtensions.LocalVRCPlayer.Method_Public_Void_Boolean_0(false);
+            LocalVRCPlayer.Method_Public_Void_Boolean_0(false);
         }
 
         public static VRCPlayer GetVRCPlayer(this Player player)
@@ -291,32 +291,32 @@ namespace MuteAllQuestUsers
 
         public static void SetLocalPlayerWalkSpeed(float speed)
         {
-            PlayerExtensions.LocalPlayer.GetVRCPlayerApi().SetWalkSpeed(speed);
+            LocalPlayer.GetVRCPlayerApi().SetWalkSpeed(speed);
         }
 
         public static void SetLocalPlayerWalkSpeed()
         {
-            PlayerExtensions.LocalPlayer.GetVRCPlayerApi().SetWalkSpeed(0f);
+            LocalPlayer.GetVRCPlayerApi().SetWalkSpeed(0f);
         }
 
         public static void SetLocalPlayerRunSpeed(float speed)
         {
-            PlayerExtensions.LocalPlayer.GetVRCPlayerApi().SetRunSpeed(speed);
+            LocalPlayer.GetVRCPlayerApi().SetRunSpeed(speed);
         }
 
         public static void SetLocalPlayerRunSpeed()
         {
-            PlayerExtensions.LocalPlayer.GetVRCPlayerApi().SetRunSpeed(0f);
+            LocalPlayer.GetVRCPlayerApi().SetRunSpeed(0f);
         }
 
         public static void SetLocalPlayerStrafeSpeed(float speed)
         {
-            PlayerExtensions.LocalPlayer.GetVRCPlayerApi().SetStrafeSpeed(speed);
+            LocalPlayer.GetVRCPlayerApi().SetStrafeSpeed(speed);
         }
 
         public static void SetLocalPlayerStrafeSpeed()
         {
-            PlayerExtensions.LocalPlayer.GetVRCPlayerApi().SetStrafeSpeed(0f);
+            LocalPlayer.GetVRCPlayerApi().SetStrafeSpeed(0f);
         }
 
         public static void ToggleBlock(string player)
@@ -325,7 +325,7 @@ namespace MuteAllQuestUsers
 
         public static Player GetPlayer(int ActorNumber)
         {
-            return (from p in PlayerExtensions.AllPlayers
+            return (from p in AllPlayers
                     where p.GetActorNumber() == ActorNumber
                     select p).FirstOrDefault<Player>();
         }
@@ -337,7 +337,7 @@ namespace MuteAllQuestUsers
 
         public static Player GetPlayer(string Displayname)
         {
-            return (from p in PlayerExtensions.AllPlayers
+            return (from p in AllPlayers
                     where p.GetName() == Displayname
                     select p).FirstOrDefault<Player>();
         }
@@ -354,19 +354,19 @@ namespace MuteAllQuestUsers
 
         public static Player GetPlayerByID(string UserID)
         {
-            return (from p in PlayerExtensions.AllPlayers
+            return (from p in AllPlayers
                     where p.GetAPIUser().id == UserID
                     select p).FirstOrDefault<Player>();
         }
 
         public static void SetGain(float Gain)
         {
-            PlayerExtensions.LocalGain = Gain;
+            LocalGain = Gain;
         }
 
         public static void ResetGain()
         {
-            USpeaker.field_Internal_Static_Single_1 = PlayerExtensions.DefaultGain;
+            USpeaker.field_Internal_Static_Single_1 = DefaultGain;
         }
 
         public static bool IsInWorld()
