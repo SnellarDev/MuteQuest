@@ -16,7 +16,7 @@ namespace MuteAllQuestUsers
             return new HarmonyMethod(YourClass.GetMethod(MethodName, stat | pub));
         }
 
-        private static readonly HarmonyInstance HInstance = HarmonyInstance.Create("DripPatches");
+        private static readonly HarmonyInstance HInstance = HarmonyInstance.Create("StarlightPatches");
 
         internal static Type GetPatch(string v)
         {
