@@ -1,5 +1,6 @@
-﻿using MelonLoader;
-using RubyButtonAPI;
+﻿using KiraiMod.WingAPI;
+using KiraiMod.WingAPI.RawUI;
+using MelonLoader;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,13 +11,12 @@ namespace MuteAllQuestUsers
 {
     public class MuteThem : MelonMod
     {
-        internal static QMToggleButton MuteButton;
         public static bool Mute = false;
-        public static bool hasinit;
 
         public override void OnApplicationStart()
         {
             CheckPlayers().Start();
+            WingAPI.Initialize();
             WhereDaUI().Start();
         }
 
@@ -95,13 +95,18 @@ namespace MuteAllQuestUsers
 
        public static void DAGUI()
         {
-            MuteButton = new QMToggleButton("ShortcutMenu", 5, -1, "MuteQuest", delegate
+            try
             {
-                Mute = true;
-            }, "OFF", delegate
+                WingAPI.OnWingInit += new System.Action<Wing.BaseWing>(wing123 =>
+                {
+                    WingPage page123 = wing123.CreatePage("MuteQuest");
+                    WingToggle toggle123 = page123.CreateToggle("Mute", 0, UnityEngine.Color.green, UnityEngine.Color.red, false, new System.Action<bool>(state => Mute = state));
+                });
+            }
+            catch (Exception ex)
             {
-                Mute = false;
-            }, "Mutes all Quest Users", Color.cyan, Color.cyan, false, false);
+                MelonLogger.Msg(ex);
+            }
         }
         private IEnumerator WhereDaUI()
         {
