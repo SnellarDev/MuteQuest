@@ -15,9 +15,9 @@ namespace MuteAllQuestUsers
 
         public override void OnApplicationStart()
         {
-            CheckPlayers().Start();
+            MelonCoroutines.Start(CheckPlayers());
             WingAPI.Initialize();
-            WhereDaUI().Start();
+            MelonCoroutines.Start(WhereDaUI());
         }
 
         public static IEnumerator CheckPlayers()
@@ -44,7 +44,7 @@ namespace MuteAllQuestUsers
             }
         }
 
-        // CREDITS day helped me with da queue player i love you uwu
+        // CREDITS day helped me with the queue player i love you uwu
 
         public static IEnumerator QueuePlayerActions(Action<Player> OnPlayerAction, float WaitBetweenPlayer)
         {

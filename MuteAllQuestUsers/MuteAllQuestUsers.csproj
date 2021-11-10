@@ -641,7 +641,6 @@
     <Compile Include="Kirai\WingButton.cs" />
     <Compile Include="Kirai\WingPage.cs" />
     <Compile Include="Kirai\WingToggle.cs" />
-    <Compile Include="Misc.cs" />
     <Compile Include="MuteThem.cs" />
     <Compile Include="Playerextensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
