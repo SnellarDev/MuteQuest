@@ -8,7 +8,7 @@ Only time you might have a problem with this is if you are using other clients t
 
 # GUI
 
-I'm using ruby button api by dubyadude
+I'm using Kirai's UI
 
 # Updates
 
