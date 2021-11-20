@@ -1,9 +1,12 @@
-﻿using KiraiMod.WingAPI;
+﻿using HarmonyLib;
+using KiraiMod.WingAPI;
 using KiraiMod.WingAPI.RawUI;
 using MelonLoader;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using UnityEngine;
 using VRC;
 
@@ -12,86 +15,72 @@ namespace MuteAllQuestUsers
     public class MuteThem : MelonMod
     {
         public static bool Mute = false;
-
+        public static Dictionary<string, int> User = new Dictionary<string, int>();
+        public static HarmonyLib.Harmony Instance = new HarmonyLib.Harmony("Patches");
+        public static int value = 1;
         public override void OnApplicationStart()
         {
-            MelonCoroutines.Start(CheckPlayers());
             WingAPI.Initialize();
             MelonCoroutines.Start(WhereDaUI());
+            InitPatches();
         }
-
-        public static IEnumerator CheckPlayers()
+        private static HarmonyMethod GetPatch(string name)
         {
-            for (; ; )
-            {
-                if (PlayerExtensions.IsInWorld())
-                {
-                    yield return QueuePlayerActions(delegate (Player player)
-                    {
-                        try
-                        {
-                            MuteAllQuest(player);
-                        }
-                        catch
-                        {
-                        }
-                    }, 0.1f);
-                }
-                else
-                {
-                    yield return new WaitForSeconds(4);
-                }
-            }
+            return new HarmonyMethod(typeof(MuteThem).GetMethod(name, BindingFlags.Static | BindingFlags.NonPublic));
         }
-
-        // CREDITS day helped me with the queue player i love you uwu
-
-        public static IEnumerator QueuePlayerActions(Action<Player> OnPlayerAction, float WaitBetweenPlayer)
+        private static void InitPatches()
         {
-            var AllPlayers = PlayerExtensions.GetAllPlayers();
-            foreach (var player in AllPlayers)
-            {
-                if (player != null)
-                {
-                    OnPlayerAction?.Invoke(player);
-                    yield return new WaitForSeconds(WaitBetweenPlayer);
-                }
-            }
-            yield return null;
+            MethodInfo[] array = (from m in typeof(NetworkManager).GetMethods()
+                                  where m.Name.Contains("Method_Public_Void_Player_") && !m.Name.Contains("PDM")
+                                  select m).ToArray<MethodInfo>();
+            try { Instance.Patch(AccessTools.Method(typeof(NetworkManager), array[1].Name, null, null), GetPatch("OnPlayerLeft")); } catch (Exception e) { MelonLogger.Error($"Error Patching OnPlayerLeft => {e.Message}"); }
+            try { Instance.Patch(AccessTools.Method(typeof(NetworkManager), array[0].Name, null, null), GetPatch("OnPlayerJoined")); } catch (Exception e) { MelonLogger.Error($"Error Patching OnPlayerJoined => {e.Message}"); }
         }
-
-        private static void MuteAllQuest(Player __0)
+        private static bool OnPlayerJoined(ref VRC.Player __0)
         {
-            if (Mute && __0.IsQuest()) // this will also mute people who spoof xd if you wanna be a quest user so bad then i guess we'll treat you like one
+            try
             {
-                if (User.ContainsKey(PlayerExtensions.GetAPIUser(__0).id))
-                {
-                    if (__0 == null)
-                    {
-                        User.Remove(__0.GetAPIUser().id);
-                    }
-                    else
-                    {
-                        return;
-                    }
-                }
-                else
-                {
-                    User.Add(PlayerExtensions.GetAPIUser(__0).id, new MuteThem());
-                    __0.LocalMute();
-                }
+                MuteCheck(__0);
             }
-            else if (__0.IsQuest() && !Mute)
+            catch { }
+            return true;
+        }
+        private static bool OnPlayerLeft(ref VRC.Player __0)
+        {
+            try
             {
                 if (User.ContainsKey(PlayerExtensions.GetAPIUser(__0).id))
                 {
                     User.Remove(__0.GetAPIUser().id);
-                    __0.LocalUnMute();
                 }
             }
+            catch { }
+            return true;
         }
 
-        internal static Dictionary<string, MuteThem> User = new Dictionary<string, MuteThem>();
+        private static void MuteCheck(Player __0)
+        {
+           if (Mute && __0.IsQuest() && __0.IsInVR())
+           {
+               User.Add(PlayerExtensions.GetAPIUser(__0).id, ++value);
+               __0.LocalMute();
+           }
+           else
+           {
+               if (User.ContainsKey(PlayerExtensions.GetAPIUser(__0).id))
+               {
+                   User.Remove(__0.GetAPIUser().id);
+                   __0.LocalUnMute();
+               }
+           }
+        }
+        private static void MuteCheckAll()
+        {
+            foreach(var player in PlayerExtensions.AllPlayers)
+            {
+                MuteCheck(player);
+            }
+        }
 
        public static void DAGUI()
         {
@@ -100,7 +89,19 @@ namespace MuteAllQuestUsers
                 WingAPI.OnWingInit += new System.Action<Wing.BaseWing>(wing123 =>
                 {
                     WingPage page123 = wing123.CreatePage("MuteQuest");
-                    WingToggle toggle123 = page123.CreateToggle("Mute", 0, UnityEngine.Color.green, UnityEngine.Color.red, false, new System.Action<bool>(state => Mute = state));
+                    WingToggle toggle123 = page123.CreateToggle("Mute", 0, UnityEngine.Color.green, UnityEngine.Color.red, false, (bool toggled) =>
+                    {
+                        if (toggled)
+                        {
+                            Mute = true;
+                            MuteCheckAll();
+                        }
+                        else
+                        {
+                            Mute = false;
+                            MuteCheckAll();
+                        }
+                    });
                 });
             }
             catch (Exception ex)
