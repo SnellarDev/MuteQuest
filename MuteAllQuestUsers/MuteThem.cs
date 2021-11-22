@@ -14,28 +14,22 @@ namespace MuteAllQuestUsers
 {
     public class MuteThem : MelonMod
     {
-        public static bool Mute = false;
-        public static Dictionary<string, int> User = new Dictionary<string, int>();
-        public static HarmonyLib.Harmony Instance = new HarmonyLib.Harmony("Patches");
-        public static int value = 1;
         public override void OnApplicationStart()
         {
             WingAPI.Initialize();
             MelonCoroutines.Start(WhereDaUI());
             InitPatches();
         }
-        private static HarmonyMethod GetPatch(string name)
-        {
-            return new HarmonyMethod(typeof(MuteThem).GetMethod(name, BindingFlags.Static | BindingFlags.NonPublic));
-        }
+
         private static void InitPatches()
         {
             MethodInfo[] array = (from m in typeof(NetworkManager).GetMethods()
                                   where m.Name.Contains("Method_Public_Void_Player_") && !m.Name.Contains("PDM")
-                                  select m).ToArray<MethodInfo>();
+                                  select m).ToArray();
             try { Instance.Patch(AccessTools.Method(typeof(NetworkManager), array[1].Name, null, null), GetPatch("OnPlayerLeft")); } catch (Exception e) { MelonLogger.Error($"Error Patching OnPlayerLeft => {e.Message}"); }
             try { Instance.Patch(AccessTools.Method(typeof(NetworkManager), array[0].Name, null, null), GetPatch("OnPlayerJoined")); } catch (Exception e) { MelonLogger.Error($"Error Patching OnPlayerJoined => {e.Message}"); }
         }
+
         private static bool OnPlayerJoined(ref VRC.Player __0)
         {
             try
@@ -45,14 +39,13 @@ namespace MuteAllQuestUsers
             catch { }
             return true;
         }
+
         private static bool OnPlayerLeft(ref VRC.Player __0)
         {
             try
             {
                 if (User.ContainsKey(PlayerExtensions.GetAPIUser(__0).id))
-                {
                     User.Remove(__0.GetAPIUser().id);
-                }
             }
             catch { }
             return true;
@@ -65,21 +58,16 @@ namespace MuteAllQuestUsers
                User.Add(PlayerExtensions.GetAPIUser(__0).id, ++value);
                __0.LocalMute();
            }
-           else
+           else if(User.ContainsKey(PlayerExtensions.GetAPIUser(__0).id))
            {
-               if (User.ContainsKey(PlayerExtensions.GetAPIUser(__0).id))
-               {
-                   User.Remove(__0.GetAPIUser().id);
-                   __0.LocalUnMute();
-               }
+               User.Remove(__0.GetAPIUser().id);
+               __0.LocalUnMute();
            }
         }
         private static void MuteCheckAll()
         {
             foreach(var player in PlayerExtensions.AllPlayers)
-            {
                 MuteCheck(player);
-            }
         }
 
        public static void DAGUI()
@@ -106,14 +94,28 @@ namespace MuteAllQuestUsers
             }
             catch (Exception ex)
             {
-                MelonLogger.Msg(ex);
+                MelonLogger.Error(ex);
             }
         }
+
         private IEnumerator WhereDaUI()
         {
             while (VRCUiManager.prop_VRCUiManager_0 == null) yield return null;
             DAGUI();
             yield break;
         }
+
+        private static HarmonyMethod GetPatch(string name)
+        {
+            return new HarmonyMethod(typeof(MuteThem).GetMethod(name, BindingFlags.Static | BindingFlags.NonPublic));
+        }
+
+        public static bool Mute = false;
+
+        public static Dictionary<string, int> User = new Dictionary<string, int>();
+
+        public static HarmonyLib.Harmony Instance = new HarmonyLib.Harmony("Patches");
+        
+        public static int value = 1;
     }
 }
