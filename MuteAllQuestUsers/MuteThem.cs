@@ -18,34 +18,18 @@ namespace MuteAllQuestUsers
         {
             WingAPI.Initialize();
             MelonCoroutines.Start(WhereDaUI());
-            InitPatches();
-        }
-
-        private static void InitPatches()
-        {
             MethodInfo[] array = (from m in typeof(NetworkManager).GetMethods()
                                   where m.Name.Contains("Method_Public_Void_Player_") && !m.Name.Contains("PDM")
                                   select m).ToArray();
-            try { Instance.Patch(AccessTools.Method(typeof(NetworkManager), array[1].Name, null, null), GetPatch("OnPlayerLeft")); } catch (Exception e) { MelonLogger.Error($"Error Patching OnPlayerLeft => {e.Message}"); }
-            try { Instance.Patch(AccessTools.Method(typeof(NetworkManager), array[0].Name, null, null), GetPatch("OnPlayerJoined")); } catch (Exception e) { MelonLogger.Error($"Error Patching OnPlayerJoined => {e.Message}"); }
+            try { HarmonyInstance.Patch(AccessTools.Method(typeof(NetworkManager), array[0].Name, null, null), GetPatch("OnPlayerJoined")); } catch (Exception e) { MelonLogger.Error($"Error Patching OnPlayerJoined => {e.Message}"); }
         }
 
         private static bool OnPlayerJoined(ref VRC.Player __0)
         {
             try
             {
+                if(Mute)
                 MuteCheck(__0);
-            }
-            catch { }
-            return true;
-        }
-
-        private static bool OnPlayerLeft(ref VRC.Player __0)
-        {
-            try
-            {
-                if (User.ContainsKey(PlayerExtensions.GetAPIUser(__0).id))
-                    User.Remove(__0.GetAPIUser().id);
             }
             catch { }
             return true;
@@ -54,15 +38,9 @@ namespace MuteAllQuestUsers
         private static void MuteCheck(Player __0)
         {
            if (Mute && __0.IsQuest() && __0.IsInVR())
-           {
-               User.Add(PlayerExtensions.GetAPIUser(__0).id, ++value);
                __0.LocalMute();
-           }
-           else if(User.ContainsKey(PlayerExtensions.GetAPIUser(__0).id))
-           {
-               User.Remove(__0.GetAPIUser().id);
+           else if(__0.IsQuest() && __0.IsInVR())
                __0.LocalUnMute();
-           }
         }
         private static void MuteCheckAll()
         {
@@ -111,11 +89,5 @@ namespace MuteAllQuestUsers
         }
 
         public static bool Mute = false;
-
-        public static Dictionary<string, int> User = new Dictionary<string, int>();
-
-        public static HarmonyLib.Harmony Instance = new HarmonyLib.Harmony("Patches");
-        
-        public static int value = 1;
     }
 }
